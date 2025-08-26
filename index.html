@@ -206,35 +206,6 @@
             </div>
 
             <div id="cotacao" class="tab-content active">
-                <div class="aba-introducao">
-                    <h3>🧮 Calculadora de Cotação Comparativa</h3>
-                    <p>Compare fornecedores considerando os impactos da Reforma Tributária</p>
-                    <p>Analise créditos tributários em diferentes cenários: transição (2027/2028) e pós-reforma (2033)</p>
-                    
-                    <div class="feature-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">📊</div>
-                            <h4>Análise Comparativa</h4>
-                            <p>Compare múltiplos fornecedores com cálculos precisos de crédito tributário</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">🏗️</div>
-                            <h4>Construção Civil</h4>
-                            <p>Cálculos específicos para materiais, serviços e locações no setor</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">📈</div>
-                            <h4>Cenários Tributários</h4>
-                            <p>Simulações para período de transição e pós-reforma tributária</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">📋</div>
-                            <h4>Relatórios</h4>
-                            <p>Exporte análises em PDF e CSV para tomada de decisão</p>
-                        </div>
-                    </div>
-                </div>
-
                 <h2>Cotação Comparativa</h2>
                 <div class="two-columns">
                     <div>
@@ -409,235 +380,588 @@
         </div>
     </div>
 
+    <script src="script.js"></script>
     <script>
-        // --- CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ---
-        const API_KEY = "ec83f922-db4f-4cec-924f-77f5c6320fa8-0ebe2bcd-046f-4a1b-9cdb-f4085b39f272";
-        const API_BASE_URL = "https://api.cnpja.com/office/";
-        let fornecedoresCotacao = JSON.parse(localStorage.getItem('fornecedoresCotacao')) || [];
-        let fornecedoresFavoritos = JSON.parse(localStorage.getItem('fornecedoresFavoritos')) || [];
-        const SERVICOS_ADMINISTRATIVOS = ["Advocacia", "Medicina", "Odontologia", "Engenharia", "Arquitetura", "Contabilidade", "Consultoria Empresarial", "Psicologia", "Enfermagem", "Fisioterapia", "Nutrição", "Análise e Desenvolvimento de Sistemas", "Design Gráfico", "Publicidade e Propaganda", "Tradução e Interpretação", "Auditoria", "Journalism", "Ciências Atuariais", "Educação (professores particulares)", "Veterinária", "Assessoria Técnica", "Química (laboratórios e análises técnicas)", "Biologia (consultoria ambiental, por exemplo)", "Geologia", "Estatística", "Terapia Ocupacional", "Administração de Empresas (consultoria)", "Informática (suporte técnico e consultoria)", "Marketing Digital", "Fotografia Profissional", "Terapia e Coaching", "Análise e Diagnóstico Técnico", "Pesquisa Científica", "Consultoria Financeira", "Serviços de Tradução Técnica", "Avaliação e Perícias Técnicas"];
-
-        // Lista de empreendimentos com opção RET
-        const EMPREENDIMENTOS = [
-            { empresa: "CL", regional: "LDB", nome: "Absoluto", ret: true },
-            { empresa: "PL", regional: "MGA", nome: "Aerie", ret: false },
-            { empresa: "PL", regional: "CWB", nome: "Ágon", ret: false },
-            { empresa: "PL", regional: "CGR", nome: "Alameda Jardim", ret: false },
-            { empresa: "PL", regional: "MGA", nome: "ALMÁH", ret: false },
-            { empresa: "PL", regional: "MGA", nome: "Almond", ret: true },
-            { empresa: "FI", regional: "SÃO", nome: "Altier Moema Pássaros", ret: true },
-            { empresa: "PL", regional: "CBA", nome: "Apogeo", ret: true },
-            { empresa: "PL", regional: "LDB", nome: "Arbo Flora", ret: true },
-            { empresa: "VA", regional: "CWB", nome: "Arch", ret: true },
-            { empresa: "VA", regional: "CBA", nome: "Arch Jardim Cuiabá", ret: true },
-            { empresa: "VA", regional: "LDB", nome: "Arch Palhano", ret: true },
-            { empresa: "PL", regional: "CWB", nome: "Art Houses", ret: true },
-            { empresa: "PL", regional: "LDB", nome: "Artesano", ret: true },
-            { empresa: "PL", regional: "CGR", nome: "Artheo - Concept Living", ret: true },
-            { empresa: "B1", regional: "LDB", nome: "Atelie", ret: true },
-            { empresa: "B3", regional: "CGR", nome: "Atmosphere", ret: false },
-            { empresa: "PL", regional: "CWB", nome: "Atrio", ret: false },
-            { empresa: "PL", regional: "LDB", nome: "Atrio 1050", ret: true },
-            { empresa: "PL", regional: "CBA", nome: "Aughe", ret: true },
-            { empresa: "PL", regional: "LDB", nome: "Aura", ret: true },
-            { empresa: "PR", regional: "CBA", nome: "AURUM", ret: true },
-            { empresa: "VA", regional: "CWB", nome: "Auth", ret: true },
-            { empresa: "C1", regional: "CPS", nome: "Authentic", ret: true },
-            { empresa: "PL", regional: "CBA", nome: "Authentique", ret: true },
-            { empresa: "PL", regional: "CGR", nome: "Aztris", ret: true }
-        ];
-
-        const PRAZOS_PAGAMENTO = [
-            {value: "0", label: "À Vista"},
-            {value: "0/15 DD", label: "0/15 70% a vista / 30% c/ 15 dias de Faturamento"},
-            {value: "05 VEZES", label: "05 VEZES"},
-            {value: "08/36/66/94DD", label: "08/36/66/94 Dias do Faturamento"},
-            {value: "09/16 DD", label: "09/16 Dias do Faturamento"},
-            {value: "1", label: "1 Dia Líquido"},
-            {value: "1 MENSAL", label: "1 Parcela Mensal"},
-            {value: "10 MENSAIS", label: "10 Parcelas Mensais e Iguais"},
-            {value: "105DD", label: "105 Dias do Faturamento"},
-            {value: "10DD", label: "10 Dias do Faturamento"}
-        ];
-
-        // --- FUNÇÕES DE INTERFACE (UI) ---
-        function formatarCNPJ(input) {
-            let value = input.value ? input.value.replace(/\D/g, '') : input.replace(/\D/g, '');
-            value = value.replace(/^(\d{2})(\d)/, '$1.$2')
-                         .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-                         .replace(/\.(\d{3})(\d)/, '.$1/$2')
-                         .replace(/(\d{4})(\d)/, '$1-$2');
-            if (input.value !== undefined) input.value = value;
-            return value;
-        }
-
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
+        // --- LÓGICA DE NEGÓCIO E API ---
+        async function fetchCNPJData(cnpj) {
+            const cnpjLimpo = cnpj.replace(/\D/g, '');
+            if (cnpjLimpo.length !== 14) throw new Error("CNPJ inválido.");
             
-            // Atualiza o título do header baseado na aba selecionada
-            updateHeaderForTab(tabName);
-            
-            // Se for a aba "Pergunte ao Fiscal", ajusta a altura do iframe
-            if (tabName === 'pergunte-fiscal') {
-                setTimeout(ajustarAlturaIframe, 100);
+            if (API_KEY) {
+                document.getElementById('api-key-warning').style.display = 'block';
             }
-        }
 
-        function updateHeaderForTab(tabName) {
-            const headerTitle = document.getElementById('header-title');
-            const headerSubtitle = document.getElementById('header-subtitle');
+            const url = `${API_BASE_URL}${cnpjLimpo}?simples=true`;
+            const response = await fetch(url, { headers: { 'Authorization': API_KEY } });
             
-            switch(tabName) {
-                case 'cotacao':
-                    headerTitle.textContent = 'Calculadora de Cotação';
-                    headerSubtitle.textContent = 'Construção Civil - Reforma Tributária';
-                    break;
-                case 'consulta':
-                    headerTitle.textContent = 'Consulta de CNPJ';
-                    headerSubtitle.textContent = 'Verificação de dados empresariais';
-                    break;
-                case 'multiplos':
-                    headerTitle.textContent = 'Consulta em Lote';
-                    headerSubtitle.textContent = 'Verificação múltipla de CNPJs';
-                    break;
-                case 'pergunte-fiscal':
-                    headerTitle.textContent = 'Pergunte ao Fiscal';
-                    headerSubtitle.textContent = 'Assistente especializado em questões tributárias';
-                    break;
-                default:
-                    headerTitle.textContent = 'Calculadora de Cotação';
-                    headerSubtitle.textContent = 'Construção Civil - Reforma Tributária';
-                    break;
-            }
-        }
-
-        function ajustarAlturaIframe() {
-            const iframe = document.querySelector('.chat-iframe');
-            if (iframe) {
-                iframe.style.height = '100%';
-            }
-        }
-
-        function toggleAvisoReforma() {
-            const ano = document.getElementById('ano-cenario').value;
-            document.getElementById('aviso-reforma').style.display = (ano === '2033') ? 'block' : 'none';
-            document.getElementById('aviso-transicao').style.display = (ano === '2027') ? 'block' : 'none';
-        }
-
-        function toggleDetalheServico() {
-            const tipoAquisicao = document.getElementById('tipo-aquisicao').value;
-            const localGroup = document.getElementById('local-servico-group');
-            const detalheGroup = document.getElementById('detalhe-servico-group');
-            const empreendimentoGroup = document.getElementById('empreendimento-group');
-            const distribuicaoGroup = document.getElementById('distribuicao-percentual-group');
+            if (response.status === 429) throw new Error("Limite de requisições da API foi atingido. Tente novamente mais tarde.");
+            if (!response.ok) throw new Error(`Erro ao consultar o CNPJ (Status: ${response.status})`);
             
-            // Mostra campos de serviço para ambos os tipos (Material e Serviço)
-            if (tipoAquisicao.includes('Serviço') || tipoAquisicao === 'Material') {
-                localGroup.style.display = 'block';
-                
-                // Para Material, oculta o campo Tipo de Serviço
-                if (tipoAquisicao === 'Material') {
-                    detalheGroup.style.display = 'none';
-                    document.getElementById('detalhe-servico').value = '';
+            return await response.json();
+        }
+
+        // FUNÇÃO CORRIGIDA: Calcula o valor do imposto "por fora" e mantém a alíquota real
+        function calcularCreditoComponente(tipo, localServico, tipoServico, ano, isSimples, valorBruto) {
+            let aliquotaReal = 0;
+            
+            if (ano === '2027') {
+                // Cenário de transição (2027) - apenas CBS
+                if (isSimples) {
+                    aliquotaReal = 0.03;
                 } else {
-                    detalheGroup.style.display = 'block';
+                    if (tipo === 'Material') {
+                        aliquotaReal = 0.09;
+                    } else if (tipo === 'Serviço') {
+                        if (localServico === 'Administrativo') {
+                            aliquotaReal = 0.063;
+                        } else if (localServico === 'Obra') {
+                            aliquotaReal = 0.045;
+                        }
+                    }
                 }
             } else {
-                localGroup.style.display = 'none';
-                detalheGroup.style.display = 'none';
-                empreendimentoGroup.style.display = 'none';
-                document.getElementById('local-servico').value = '';
-                document.getElementById('detalhe-servico').value = '';
-                document.getElementById('empreendimento').value = '';
+                // Cenário pós-reforma (2033)
+                if (isSimples) {
+                    aliquotaReal = 0.08;
+                } else {
+                    const aliquotaCheia = 0.27, aliquotaReduzida = 0.189, aliquotaConstrucao = 0.135;
+                    if (tipo === 'Material') {
+                        aliquotaReal = aliquotaCheia;
+                    } else if (tipo === 'Serviço') {
+                        if (localServico === 'Administrativo') {
+                            aliquotaReal = SERVICOS_ADMINISTRATIVOS.includes(tipoServico) ? aliquotaReduzida : aliquotaCheia;
+                        } else if (localServico === 'Obra') {
+                            aliquotaReal = tipoServico === 'Serviços Técnicos/Profissionais' ? aliquotaReduzida : aliquotaConstrucao;
+                        }
+                    }
+                }
             }
             
-            // Mostra campos de distribuição percentual para opções combinadas
-            if (tipoAquisicao === 'Serviço + Material' || 
-                tipoAquisicao === 'Serviço + Locação' || 
-                tipoAquisicao === 'Serviço + Locação + Material') {
-                distribuicaoGroup.style.display = 'block';
-                atualizarCamposPercentuais(tipoAquisicao);
+            // CÁLCULO CORRIGIDO: O valor bruto já inclui o imposto, então precisamos calcular "por fora"
+            // Fórmula: Valor do imposto = Valor Bruto × (Alíquota / (1 + Alíquota))
+            const valorImposto = valorBruto * (aliquotaReal / (1 + aliquotaReal));
+            
+            // Retorna tanto o valor do imposto quanto a alíquota real para exibição
+            return {
+                valorImposto: valorImposto,
+                aliquotaReal: aliquotaReal
+            };
+        }
+
+        function calcularCusto(apiData, valorBruto, ano, tipoAquisicao, localServico, tipoServico, empreendimento) {
+            // Verifica primeiro se é MEI (tem prioridade máxima)
+            const isMEI = apiData.company?.simples?.mei === true;
+            // Só verifica Simples Nacional se não for MEI
+            const isSimples = !isMEI && apiData.company?.simples?.optant === true;
+            
+            // Define o regime tributário
+            const regimeTributario = isMEI ? "MEI" : 
+                           (isSimples ? "Simples Nacional" : "Normal");
+            
+            let aliquotaReal = 0;
+            let isRET = false;
+            let mensagemRET = '';
+            let mensagemMEI = '';
+
+            // VERIFICAÇÃO DO EMPREENDIMENTO RET (ADICIONADA PARA MATERIAL TAMBÉM)
+            // Agora verifica se é um empreendimento com RET tanto para Serviço quanto para Material
+            if ((tipoAquisicao.includes('Serviço') || tipoAquisicao.includes('Locação') || tipoAquisicao === 'Material') && 
+                localServico === 'Obra' && empreendimento) {
+                const emp = EMPREENDIMENTOS.find(e => e.nome === empreendimento);
+                if (emp && emp.ret) {
+                    isRET = true;
+                    mensagemRET = ' (Empreendimento RET - Sem crédito)';
+                }
+            }
+
+            // Se for MEI, não tem crédito independente do ano
+            if (isMEI) {
+                mensagemMEI = tipoAquisicao.includes('Serviço') && localServico === 'Obra' 
+                    ? ' (Fornecedor MEI - Adicionar INSS Patronal ao custo)' 
+                    : ' (Fornecedor MEI - Sem crédito)';
+                
+                return {
+                    id: Date.now(),
+                    cnpj: apiData.taxId,
+                    razao_social: apiData.company?.name || apiData.name || 'Nome não disponível',
+                    situacao_cadastral: apiData.status?.text || 'Situação não disponível',
+                    atividade_principal: apiData.mainActivity?.text || 'Atividade não informada',
+                    porte: apiData.size?.text || '',
+                    regime_tributario: "MEI", // Forçando como MEI aqui também para garantir
+                    valor_bruto: valorBruto,
+                    aliquota_real: 0,
+                    credito_iva: 0,
+                    custo_efetivo: valorBruto,
+                    contexto: { 
+                        tipoAquisicao, 
+                        localServico, 
+                        tipoServico, 
+                        ano,
+                        empreendimento,
+                        isRET,
+                        mensagemRET,
+                        isMEI: true,
+                        mensagemMEI
+                    },
+                    apiData: apiData
+                };
+            }
+
+            // Se for RET, não tem crédito independente do ano (AGORA APLICA TANTO PARA SERVIÇO QUANTO PARA MATERIAL)
+            if (isRET) {
+                return {
+                    id: Date.now(),
+                    cnpj: apiData.taxId,
+                    razao_social: apiData.company?.name || apiData.name || 'Nome não disponível',
+                    situacao_cadastral: apiData.status?.text || 'Situação não disponível',
+                    atividade_principal: apiData.mainActivity?.text || 'Atividade não informada',
+                    porte: apiData.size?.text || '',
+                    regime_tributario: regimeTributario,
+                    valor_bruto: valorBruto,
+                    aliquota_real: 0,
+                    credito_iva: 0,
+                    custo_efetivo: valorBruto,
+                    contexto: { 
+                        tipoAquisicao, 
+                        localServico, 
+                        tipoServico, 
+                        ano,
+                        empreendimento,
+                        isRET,
+                        mensagemRET,
+                        isMEI: false,
+                        mensagemMEI: ''
+                    },
+                    apiData: apiData
+                };
+            }
+
+            // Para tipos combinados, calculamos o crédito ponderado
+            if (tipoAquisicao.includes('+')) {
+                let totalCredito = 0;
+                let percentuais = {};
+                let componentes = [];
+                let aliquotaEfetiva = 0;
+                
+                if (tipoAquisicao === 'Serviço + Material') {
+                    const percentualServico = parseInt(document.getElementById('percentual-servico').value) || 0;
+                    const percentualMaterial = parseInt(document.getElementById('percentual-material').value) || 0;
+                    percentuais = { servico: percentualServico, material: percentualMaterial };
+                    
+                    // Calcula crédito para cada componente
+                    const creditoServico = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto * percentualServico / 100);
+                    const creditoMaterial = calcularCreditoComponente('Material', null, null, ano, isSimples, valorBruto * percentualMaterial / 100);
+                    
+                    totalCredito = creditoServico.valorImposto + creditoMaterial.valorImposto;
+                    
+                    // Calcula a alíquota efetiva ponderada
+                    aliquotaEfetiva = (creditoServico.aliquotaReal * percentualServico/100) + (creditoMaterial.aliquotaReal * percentualMaterial/100);
+                    
+                    componentes = [
+                        { tipo: 'Serviço', percentual: percentualServico, credito: creditoServico.valorImposto, aliquota: creditoServico.aliquotaReal },
+                        { tipo: 'Material', percentual: percentualMaterial, credito: creditoMaterial.valorImposto, aliquota: creditoMaterial.aliquotaReal }
+                    ];
+                } 
+                else if (tipoAquisicao === 'Serviço + Locação') {
+                    const percentualServico = parseInt(document.getElementById('percentual-servico').value) || 0;
+                    const percentualLocacao = parseInt(document.getElementById('percentual-locacao').value) || 0;
+                    percentuais = { servico: percentualServico, locacao: percentualLocacao };
+                    
+                    // Locação é tratada como serviço na obra com alíquota reduzida
+                    const creditoServico = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto * percentualServico / 100);
+                    const creditoLocacao = calcularCreditoComponente('Serviço', 'Obra', 'Locação de Equipamentos', ano, isSimples, valorBruto * percentualLocacao / 100);
+                    
+                    totalCredito = creditoServico.valorImposto + creditoLocacao.valorImposto;
+                    
+                    // Calcula a alíquota efetiva ponderada
+                    aliquotaEfetiva = (creditoServico.aliquotaReal * percentualServico/100) + (creditoLocacao.aliquotaReal * percentualLocacao/100);
+                    
+                    componentes = [
+                        { tipo: 'Serviço', percentual: percentualServico, credito: creditoServico.valorImposto, aliquota: creditoServico.aliquotaReal },
+                        { tipo: 'Locação', percentual: percentualLocacao, credito: creditoLocacao.valorImposto, aliquota: creditoLocacao.aliquotaReal }
+                    ];
+                }
+                else if (tipoAquisicao === 'Serviço + Locação + Material') {
+                    const percentualServico = parseInt(document.getElementById('percentual-servico').value) || 0;
+                    const percentualLocacao = parseInt(document.getElementById('percentual-locacao').value) || 0;
+                    const percentualMaterial = parseInt(document.getElementById('percentual-material').value) || 0;
+                    percentuais = { servico: percentualServico, locacao: percentualLocacao, material: percentualMaterial };
+                    
+                    const creditoServico = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto * percentualServico / 100);
+                    const creditoLocacao = calcularCreditoComponente('Serviço', 'Obra', 'Locação de Equipamentos', ano, isSimples, valorBruto * percentualLocacao / 100);
+                    const creditoMaterial = calcularCreditoComponente('Material', null, null, ano, isSimples, valorBruto * percentualMaterial / 100);
+                    
+                    totalCredito = creditoServico.valorImposto + creditoLocacao.valorImposto + creditoMaterial.valorImposto;
+                    
+                    // Calcula a alíquota efetiva ponderada
+                    aliquotaEfetiva = (creditoServico.aliquotaReal * percentualServico/100) + 
+                                      (creditoLocacao.aliquotaReal * percentualLocacao/100) + 
+                                      (creditoMaterial.aliquotaReal * percentualMaterial/100);
+                    
+                    componentes = [
+                        { tipo: 'Serviço', percentual: percentualServico, credito: creditoServico.valorImposto, aliquota: creditoServico.aliquotaReal },
+                        { tipo: 'Locação', percentual: percentualLocacao, credito: creditoLocacao.valorImposto, aliquota: creditoLocacao.aliquotaReal },
+                        { tipo: 'Material', percentual: percentualMaterial, credito: creditoMaterial.valorImposto, aliquota: creditoMaterial.aliquotaReal }
+                    ];
+                }
+                
+                const custoEfetivo = valorBruto - totalCredito;
+                
+                return {
+                    id: Date.now(),
+                    cnpj: apiData.taxId,
+                    razao_social: apiData.company?.name || apiData.name || 'Nome não disponível',
+                    situacao_cadastral: apiData.status?.text || 'Situação não disponível',
+                    atividade_principal: apiData.mainActivity?.text || 'Atividade não informada',
+                    porte: apiData.size?.text || '',
+                    regime_tributario: regimeTributario,
+                    valor_bruto: valorBruto,
+                    aliquota_real: aliquotaEfetiva,
+                    credito_iva: totalCredito,
+                    custo_efetivo: custoEfetivo,
+                    contexto: { 
+                        tipoAquisicao, 
+                        localServico, 
+                        tipoServico, 
+                        ano,
+                        empreendimento,
+                        isRET,
+                        mensagemRET,
+                        isMEI: false,
+                        mensagemMEI: '',
+                        percentuais,
+                        componentes
+                    },
+                    apiData: apiData
+                };
+            }
+
+            // Restante da lógica original para tipos simples (Material ou Serviço)
+            let resultadoCalculo;
+            
+            if (ano === '2027') {
+                // Cenário de transição (2027) - apenas CBS
+                if (isSimples) {
+                    resultadoCalculo = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto);
+                    aliquotaReal = 0.03; // 3% para Simples Nacional
+                    mensagemRET = ' (Período de transição - CBS 3%)';
+                } else {
+                    if (tipoAquisicao === 'Material') {
+                        resultadoCalculo = calcularCreditoComponente('Material', null, null, ano, isSimples, valorBruto);
+                        aliquotaReal = 0.09; // 9% para materiais
+                        mensagemRET = ' (Período de transição - apenas CBS 9%)';
+                    } else if (tipoAquisicao === 'Serviço') {
+                        resultadoCalculo = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto);
+                        if (localServico === 'Administrativo') {
+                            aliquotaReal = 0.063; // 6,3% para serviços profissionais/administrativos
+                            mensagemRET = ' (Período de transição - apenas CBS 6,3%)';
+                        } else if (localServico === 'Obra') {
+                            aliquotaReal = 0.045; // 4,5% para serviços na obra
+                            mensagemRET = ' (Período de transição - apenas CBS 4,5%)';
+                        }
+                    }
+                }
             } else {
-                distribuicaoGroup.style.display = 'none';
+                // Cenário pós-reforma (2033) - lógica original
+                if (isSimples) {
+                    resultadoCalculo = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto);
+                    aliquotaReal = 0.08;
+                } else {
+                    const aliquotaCheia = 0.27, aliquotaReduzida = 0.189, aliquotaConstrucao = 0.135;
+                    if (tipoAquisicao === 'Material') {
+                        resultadoCalculo = calcularCreditoComponente('Material', null, null, ano, isSimples, valorBruto);
+                        aliquotaReal = aliquotaCheia;
+                    } else if (tipoAquisicao === 'Serviço') {
+                        resultadoCalculo = calcularCreditoComponente('Serviço', localServico, tipoServico, ano, isSimples, valorBruto);
+                        if (localServico === 'Administrativo') {
+                            aliquotaReal = SERVICOS_ADMINISTRATIVOS.includes(tipoServico) ? aliquotaReduzida : aliquotaCheia;
+                        } else if (localServico === 'Obra') {
+                            aliquotaReal = tipoServico === 'Serviços Técnicos/Profissionais' ? aliquotaReduzida : aliquotaConstrucao;
+                        }
+                    }
+                }
             }
-            
-            // Atualiza os campos de serviço com base na seleção atual
-            atualizarCamposServico();
+
+            const creditoIva = resultadoCalculo.valorImposto;
+            const custoEfetivo = valorBruto - creditoIva;
+
+            return {
+                id: Date.now(),
+                cnpj: apiData.taxId,
+                razao_social: apiData.company?.name || apiData.name || 'Nome não disponível',
+                situacao_cadastral: apiData.status?.text || 'Situação não disponível',
+                atividade_principal: apiData.mainActivity?.text || 'Atividade não informada',
+                porte: apiData.size?.text || '',
+                regime_tributario: regimeTributario,
+                valor_bruto: valorBruto,
+                aliquota_real: aliquotaReal,
+                credito_iva: creditoIva,
+                custo_efetivo: custoEfetivo,
+                contexto: { 
+                    tipoAquisicao, 
+                    localServico, 
+                    tipoServico, 
+                    ano,
+                    empreendimento,
+                    isRET: false,
+                    mensagemRET,
+                    isMEI: false,
+                    mensagemMEI: ''
+                },
+                apiData: apiData
+            };
         }
 
-        function atualizarCamposPercentuais(tipoAquisicao) {
-            const container = document.getElementById('campos-percentuais');
-            const totalSpan = document.getElementById('total-percentual');
-            container.innerHTML = '';
+        async function adicionarFornecedor() {
+            const erroDiv = document.getElementById('erro-cotacao');
+            const addButton = document.getElementById('add-fornecedor-btn');
+            erroDiv.style.display = 'none';
             
-            // Cria campos baseados no tipo de aquisição
-            if (tipoAquisicao === 'Serviço + Material') {
-                container.innerHTML = `
-                    <div>
-                        <label for="percentual-servico">Serviço:</label>
-                        <input type="number" id="percentual-servico" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                    <div>
-                        <label for="percentual-material">Material:</label>
-                        <input type="number" id="percentual-material" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                `;
-            } else if (tipoAquisicao === 'Serviço + Locação') {
-                container.innerHTML = `
-                    <div>
-                        <label for="percentual-servico">Serviço:</label>
-                        <input type="number" id="percentual-servico" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                    <div>
-                        <label for="percentual-locacao">Locação:</label>
-                        <input type="number" id="percentual-locacao" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                `;
-            } else if (tipoAquisicao === 'Serviço + Locação + Material') {
-                container.innerHTML = `
-                    <div>
-                        <label for="percentual-servico">Serviço:</label>
-                        <input type="number" id="percentual-servico" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                    <div>
-                        <label for="percentual-locacao">Locação:</label>
-                        <input type="number" id="percentual-locacao" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                    <div>
-                        <label for="percentual-material">Material:</label>
-                        <input type="number" id="percentual-material" min="0" max="100" oninput="calcularTotalPercentual()">
-                    </div>
-                `;
+            try {
+                addButton.disabled = true;
+                addButton.textContent = 'Consultando...';
+                document.getElementById('tabela-fornecedores-cotacao').innerHTML = '<div class="loading"><div class="spinner"></div>Consultando dados do fornecedor...</div>';
+
+                const ano = document.getElementById('ano-cenario').value;
+                const tipoAquisicao = document.getElementById('tipo-aquisicao').value;
+                const localServico = document.getElementById('local-servico').value;
+                const tipoServico = document.getElementById('detalhe-servico').value;
+                const empreendimento = document.getElementById('empreendimento').value;
+                const cnpj = document.getElementById('cnpj-cotacao').value;
+                const valorBruto = parseFloat(document.getElementById('valor-bruto').value);
+                const prazoPagamento = document.getElementById('prazo-pagamento').value;
+                
+                if (!tipoAquisicao || !cnpj.trim() || !valorBruto || valorBruto <= 0) {
+                    throw new Error("Preencha todos os campos principais: Tipo de Aquisição, CNPJ e Valor Bruto.");
+                }
+                
+                // Validação para Material - requer Local do Serviço
+                if (tipoAquisicao === 'Material' && !localServico) {
+                    throw new Error("Para 'Material', selecione o Local do Serviço.");
+                }
+                
+                // Validação para Serviço - requer Local e Tipo de Serviço
+                if (tipoAquisicao.includes('Serviço') && (!localServico || !tipoServico)) {
+                    throw new Error("Para 'Serviço', selecione o Local e o Tipo de Serviço.");
+                }
+                
+                // Validação para tipos combinados
+                if (tipoAquisicao.includes('+')) {
+                    const totalSpan = document.getElementById('total-percentual');
+                    const totalText = totalSpan.textContent.replace('Total: ', '').replace('%', '');
+                    const total = parseInt(totalText);
+                    
+                    if (total !== 100) {
+                        throw new Error("A soma dos percentuais deve ser exatamente 100%.");
+                    }
+                }
+                
+                if (fornecedoresCotacao.some(f => f.cnpj === cnpj.replace(/\D/g, '') && f.valor_bruto === valorBruto)) {
+                    throw new Error("Este fornecedor com este mesmo valor já foi adicionado.");
+                }
+
+                const apiData = await fetchCNPJData(cnpj);
+                const calculo = calcularCusto(apiData, valorBruto, ano, tipoAquisicao, localServico, tipoServico, empreendimento);
+                calculo.prazo_pagamento = prazoPagamento;
+                fornecedoresCotacao.push(calculo);
+                
+                // Limpa campos para nova inserção
+                document.getElementById('cnpj-cotacao').value = '';
+                document.getElementById('valor-bruto').value = '';
+                document.getElementById('cnpj-cotacao').focus();
+
+                adicionarFeedback();
+                salvarNoLocalStorage();
+                atualizarTabelaCotacao();
+
+            } catch (error) {
+                erroDiv.innerHTML = `<strong>Erro:</strong> ${error.message}`;
+                erroDiv.style.display = 'block';
+                document.getElementById('tabela-fornecedores-cotacao').innerHTML = '';
+                atualizarTabelaCotacao();
+            } finally {
+                addButton.disabled = false;
+                addButton.textContent = 'Adicionar Fornecedor';
             }
-            
-            calcularTotalPercentual();
         }
 
-        function calcularTotalPercentual() {
-            const tipoAquisicao = document.getElementById('tipo-aquisicao').value;
-            const totalSpan = document.getElementById('total-percentual');
-            let total = 0;
+        function atualizarTabelaCotacao() {
+            const tabelaDiv = document.getElementById('tabela-fornecedores-cotacao');
             
-            if (tipoAquisicao === 'Serviço + Material') {
-                const servico = parseInt(document.getElementById('percentual-servico').value) || 0;
-                const material = parseInt(document.getElementById('percentual-material').value) || 0;
-                total = servico + material;
-            } else if (tipoAquisicao === 'Serviço + Locação') {
-                const servico = parseInt(document.getElementById('percentual-servico').value) || 0;
-                const locacao = parseInt(document.getElementById('percentual-locacao').value) || 0;
-                total = servico + locacao;
-            } else if (tipoAquisicao === 'Serviço + Locação + Material') {
-                const servico = parseInt(document.getElementById('percentual-servico').value) || 0;
-                const locacao = parseInt(document.getElementById('percentual-locacao').value) || 0;
-                const material = parseInt(document.getElementById('percentual-material').value) || 0;
-                total = servico + locacao + material;
+            if (fornecedoresCotacao.length === 0) {
+                tabelaDiv.innerHTML = '';
+                document.getElementById('dashboard-analise').style.display = 'none';
+                return;
             }
+
+            const fornecedoresOrdenados = [...fornecedoresCotacao].sort((a, b) => a.custo_efetivo - b.custo_efetivo);
+            const melhorCusto = fornecedoresOrdenados.length > 0 ? fornecedoresOrdenados[0].custo_efetivo : 0;
+
+            let html = `
+                <div class="result-card">
+                    <h3>Comparativo de Fornecedores</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95em;">
+                        <thead>
+                            <tr style="text-align: left;">
+                                <th style="padding: 12px; border-bottom: 2px solid #ddd;">Fornecedor / Detalhes</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #ddd; text-align: right;">Valores</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #ddd;">Prazo</th>
+                                <th style="padding: 12px; border-bottom: 2px solid #ddd; text-align: center;">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            fornecedoresOrdenados.forEach((fornecedor) => {
+                const isMelhor = fornecedor.custo_efetivo === melhorCusto;
+                const isAtivo = fornecedor.situacao_cadastral.toUpperCase() === 'ATIVA';
+                let rowStyle = 'transition: background-color 0.3s;';
+                
+                if (isMelhor) rowStyle += 'background-color: #e6ffed; border-left: 4px solid #28a745;';
+                else if (!isAtivo) rowStyle += 'background-color: #fff3cd; border-left: 4px solid #ffc107;';
+
+                let contextoHtml = '';
+                if (fornecedor.contexto.componentes) {
+                    // Para tipos combinados, mostra a distribuição
+                    contextoHtml = `<span style="color: #0056b3;">${fornecedor.contexto.tipoAquisicao}</span><br>`;
+                    contextoHtml += fornecedor.contexto.componentes.map(c => 
+                        `${c.tipo}: ${c.percentual}% (Alíquota: ${(c.aliquota * 100).toFixed(1)}%)`
+                    ).join('<br>');
+                    
+                    if (fornecedor.contexto.localServico) {
+                        contextoHtml += `<br><span style="color: #0056b3;">Local: ${fornecedor.contexto.localServico}</span>`;
+                    }
+                    if (fornecedor.contexto.empreendimento) {
+                        contextoHtml += `<br><span style="color: #0056b3;">Empreendimento: ${fornecedor.contexto.empreendimento}</span>`;
+                    }
+                } else {
+                    // Lógica para tipos simples (Material ou Serviço)
+                    if (fornecedor.contexto.tipoAquisicao === 'Material') {
+                        contextoHtml = `<span style="color: #0056b3;">Aquisição de Material</span>`;
+                        if (fornecedor.contexto.localServico) {
+                            contextoHtml += `<br><span style="color: #0056b3;">Local: ${fornecedor.contexto.localServico}</span>`;
+                        }
+                        if (fornecedor.contexto.empreendimento) {
+                            contextoHtml += `<br><span style="color: #0056b3;">Empreendimento: ${fornecedor.contexto.empreendimento}</span>`;
+                        }
+                    } else if (fornecedor.contexto.tipoAquisicao === 'Serviço') {
+                        contextoHtml = `<span style="color: #0056b3;">${fornecedor.contexto.localServico} > ${fornecedor.contexto.tipoServico}</span>`;
+                        if (fornecedor.contexto.empreendimento) {
+                            contextoHtml += `<br><span style="color: #0056b3;">Empreendimento: ${fornecedor.contexto.empreendimento}</span>`;
+                        }
+                    }
+                }
+
+                if (fornecedor.contexto.isRET) {
+                    contextoHtml += `<br><span style="color: #dc3545; font-weight: bold;">${fornecedor.contexto.mensagemRET}</span>`;
+                }
+
+                if (fornecedor.contexto.isMEI) {
+                    contextoHtml += `<br><span style="color: #dc3545; font-weight: bold;">${fornecedor.contexto.mensagemMEI}</span>`;
+                } else if (fornecedor.contexto.ano === '2027' && !fornecedor.contexto.isRET) {
+                    contextoHtml += `<br><span style="color: #856404; font-weight: bold;">${fornecedor.contexto.mensagemRET}</span>`;
+                }
+
+                html += `
+                    <tr style="${rowStyle}" class="fade-in" data-id="${fornecedor.id}">
+                        <td style="padding: 12px; border-bottom: 1px solid #eee; width: 45%; vertical-align: top;">
+                            <strong style="display: block; color: #333; font-size: 1.1em;">${fornecedor.razao_social}</strong>
+                            <div style="color: #555; line-height: 1.6; margin-top: 6px;">
+                                <div><strong>CNPJ:</strong> ${formatarCNPJ(fornecedor.cnpj)}</div>
+                                <div><strong>Regime:</strong> ${fornecedor.regime_tributario} | <strong>Situação:</strong> <span style="font-weight: bold; color: ${isAtivo ? 'green' : 'orange'};">${fornecedor.situacao_cadastral}</span></div>
+                                <div style="font-style: italic;"><strong>Atividade:</strong> ${fornecedor.atividade_principal}</div>
+                                <div><strong>Contexto:</strong> ${contextoHtml} (${fornecedor.contexto.ano})</div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right; vertical-align: top;">
+                            <div>Bruto: <strong>R$ ${fornecedor.valor_bruto.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></div>
+                            ${fornecedor.contexto.isRET || fornecedor.contexto.isMEI 
+                                ? '<div style="color: #dc3545; font-weight: bold;">Crédito: R$ 0,00 (0%)' + 
+                                  (fornecedor.contexto.isRET ? ' - RET' : ' - MEI') + '</div>' 
+                                : `<div>Crédito: R$ ${fornecedor.credito_iva.toLocaleString('pt-BR', {minimumFractionDigits: 2})} (${(fornecedor.aliquota_real * 100).toFixed(2)}%)</div>`}
+                            <div style="font-size: 1.3em; font-weight: bold; color: #366092; margin-top: 8px;">Custo Efetivo: R$ ${fornecedor.custo_efetivo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee; vertical-align: top;">
+                            <div><strong>${fornecedor.prazo_pagamento}</strong></div>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center; vertical-align: middle;">
+                            ${isMelhor ? '<span style="display: block; margin-bottom: 10px; background: #28a745; color: white; font-size: 0.9em; padding: 4px 8px; border-radius: 4px;">MELHOR</span>' : ''}
+                            <button onclick="removerFornecedor(${fornecedor.id})" title="Remover Fornecedor" style="background: #fbe0e0; color: #c00; border: 1px solid #f5c6cb; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 1.1em;">X</button>
+                        </td>
+                    </tr>`;
+            });
             
-            totalSpan.textContent = `Total: ${total}%`;
-            totalSpan.style.color = total === 100 ? 'green' : 'red';
+            html += `</tbody></table>`;
+            
+            if (fornecedoresCotacao.length > 0) {
+                html += `
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                        <button class="btn" onclick="exportarParaCSV()">Exportar para CSV</button>
+                        <button class="btn" onclick="limparCotacoes()" style="background: #dc3545;">Limpar Todas</button>
+                    </div>`;
+            }
+
+            html += `</div>`;
+            tabelaDiv.innerHTML = html;
+            
+            criarDashboard();
+        }
+
+        function removerFornecedor(id) {
+            fornecedoresCotacao = fornecedoresCotacao.filter(f => f.id !== id);
+            salvarNoLocalStorage();
+            atualizarTabelaCotacao();
+        }
+
+        function limparCotacoes() {
+            if(confirm('Tem certeza que deseja limpar todas as cotações?')) {
+                fornecedoresCotacao = [];
+                salvarNoLocalStorage();
+                atualizarTabelaCotacao();
+            }
+        }
+
+        function exportarParaCSV() {
+            if (fornecedoresCotacao.length === 0) {
+                alert("Não há fornecedores para exportar.");
+                return;
+            }
+
+            const headers = "Razao Social;CNPJ;Regime Tributario;Situacao Cadastral;Porte;Tipo Aquisicao;Local Servico;Tipo Servico;Empreendimento;RET;MEI;Ano;Prazo Pagamento;Valor Bruto (R$);Aliquota Credito (%);Credito IVA (R$);Custo Efetivo (R$)\n";
+            
+            const rows = fornecedoresCotacao.map(f => {
+                return [
+                    `"${f.razao_social.replace(/"/g, '""')}"`,
+                    `"${f.cnpj}"`,
+                    `"${f.regime_tributario}"`,
+                    `"${f.situacao_cadastral}"`,
+                    `"${f.porte}"`,
+                    `"${f.contexto.tipoAquisicao}"`,
+                    `"${f.contexto.localServico || 'N/A'}"`,
+                    `"${f.contexto.tipoServico || 'N/A'}"`,
+                    `"${f.contexto.empreendimento || 'N/A'}"`,
+                    `"${f.contexto.isRET ? 'Sim' : 'Não'}"`,
+                    `"${f.contexto.isMEI ? 'Sim' : 'Não'}"`,
+                    `"${f.contexto.ano}"`,
+                    `"${f.prazo_pagamento}"`,
+                    f.valor_bruto.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+                    (f.aliquota_real * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+                    f.credito_iva.toLocaleString('pt-BR', {minimumFractionDigits: 2}),
+                    f.custo_efetivo.toLocaleString('pt-BR', {minimumFractionDigits: 2})
+                ].join(';');
+            }).join('\n');
+
+            const csvContent = "\uFEFF" + headers + rows;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `cotacao_fornecedores_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Funções para as abas de consulta
@@ -655,22 +979,21 @@
                 dadosDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Consultando CNPJ...</div>';
                 resultadoDiv.style.display = 'block';
                 
-                // Simulação de consulta - substitua pela implementação real
-                setTimeout(() => {
-                    dadosDiv.innerHTML = `
-                        <div style="line-height: 1.8;">
-                            <div><strong>CNPJ:</strong> ${formatarCNPJ(cnpj)}</div>
-                            <div><strong>Razão Social:</strong> Empresa Exemplo Ltda</div>
-                            <div><strong>Situação Cadastral:</strong> Ativa</div>
-                            <div><strong>Data de Abertura:</strong> 01/01/2020</div>
-                            <div><strong>Porte:</strong> Pequena Empresa</div>
-                            <div><strong>Natureza Jurídica:</strong> Sociedade Empresária Limitada</div>
-                            <div><strong>Atividade Principal:</strong> Construção Civil</div>
-                            <div><strong>Regime Tributário:</strong> Normal</div>
-                            <div><strong>Endereço:</strong> Rua Exemplo, 123 - Centro, Cidade - UF</div>
-                        </div>
-                    `;
-                }, 1000);
+                const apiData = await fetchCNPJData(cnpj);
+                
+                dadosDiv.innerHTML = `
+                    <div style="line-height: 1.8;">
+                        <div><strong>Razão Social:</strong> ${apiData.company?.name || apiData.name || 'Não informado'}</div>
+                        <div><strong>CNPJ:</strong> ${formatarCNPJ(apiData.taxId)}</div>
+                        <div><strong>Situação Cadastral:</strong> ${apiData.status?.text || 'Não informada'}</div>
+                        <div><strong>Data de Abertura:</strong> ${apiData.opening || 'Não informada'}</div>
+                        <div><strong>Porte:</strong> ${apiData.size?.text || 'Não informado'}</div>
+                        <div><strong>Natureza Jurídica:</strong> ${apiData.legalNature?.text || 'Não informada'}</div>
+                        <div><strong>Atividade Principal:</strong> ${apiData.mainActivity?.text || 'Não informada'}</div>
+                        <div><strong>Regime Tributário:</strong> ${apiData.company?.simples?.optant ? 'Simples Nacional' : 'Normal'} ${apiData.company?.simples?.mei ? '(MEI)' : ''}</div>
+                        <div><strong>Endereço:</strong> ${apiData.address?.street || ''}, ${apiData.address?.number || ''} - ${apiData.address?.district || ''}, ${apiData.address?.city || ''} - ${apiData.address?.state || ''}</div>
+                    </div>
+                `;
             } catch (error) {
                 dadosDiv.innerHTML = `<div class="error">Erro ao consultar CNPJ: ${error.message}</div>`;
             }
@@ -698,76 +1021,219 @@
                 dadosDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Consultando CNPJs...</div>';
                 resultadoDiv.style.display = 'block';
                 
-                // Simulação de consulta em lote
-                setTimeout(() => {
-                    let resultadosHTML = '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
-                    resultadosHTML += `
-                        <thead>
-                            <tr style="background-color: #f8f9fa;">
-                                <th style="padding: 10px; border: 1px solid #ddd;">CNPJ</th>
-                                <th style="padding: 10px; border: 1px solid #ddd;">Razão Social</th>
-                                <th style="padding: 10px; border: 1px solid #ddd;">Situação</th>
-                                <th style="padding: 10px; border: 1px solid #ddd;">Regime</th>
+                let resultadosHTML = '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
+                resultadosHTML += `
+                    <thead>
+                        <tr style="background-color: #f8f9fa;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">CNPJ</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Razão Social</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Situação</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Regime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                for (const cnpj of cnpjs) {
+                    try {
+                        const apiData = await fetchCNPJData(cnpj);
+                        resultadosHTML += `
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${formatarCNPJ(apiData.taxId)}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${apiData.company?.name || apiData.name || 'Não informado'}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${apiData.status?.text || 'Não informada'}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${apiData.company?.simples?.optant ? 'Simples Nacional' : 'Normal'} ${apiData.company?.simples?.mei ? '(MEI)' : ''}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                    `;
-                    
-                    cnpjs.forEach((cnpj, index) => {
+                        `;
+                    } catch (error) {
                         resultadosHTML += `
                             <tr>
                                 <td style="padding: 10px; border: 1px solid #ddd;">${formatarCNPJ(cnpj)}</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">Empresa ${index + 1} Ltda</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">Ativa</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">Normal</td>
+                                <td colspan="3" style="padding: 10px; border: 1px solid #ddd; color: #dc3545;">Erro: ${error.message}</td>
                             </tr>
                         `;
-                    });
-                    
-                    resultadosHTML += '</tbody></table>';
-                    dadosDiv.innerHTML = resultadosHTML;
-                }, 2000);
+                    }
+                }
+                
+                resultadosHTML += '</tbody></table>';
+                dadosDiv.innerHTML = resultadosHTML;
             } catch (error) {
                 dadosDiv.innerHTML = `<div class="error">Erro ao processar consultas: ${error.message}</div>`;
             }
         }
 
-        function carregarPrazosPagamento() {
-            const select = document.getElementById('prazo-pagamento');
-            select.innerHTML = '<option value="">Selecione o prazo...</option>';
+        // Armazenamento Local
+        function salvarNoLocalStorage() {
+            localStorage.setItem('fornecedoresCotacao', JSON.stringify(fornecedoresCotacao));
+            localStorage.setItem('fornecedoresFavoritos', JSON.stringify(fornecedoresFavoritos));
+        }
+
+        // Análise Comparativa Avançada
+        function gerarAnaliseComparativa() {
+            if(fornecedoresCotacao.length < 2) return null;
             
-            PRAZOS_PAGAMENTO.forEach(prazo => {
-                const option = document.createElement('option');
-                option.value = prazo.value;
-                option.textContent = prazo.label;
-                select.appendChild(option);
+            const analise = {
+                diferencaPercentual: {},
+                economiaTotal: 0,
+                melhorFornecedor: null,
+                piorFornecedor: null,
+                mediaCustos: 0,
+                totalBruto: 0,
+                totalCredito: 0,
+                totalEfetivo: 0
+            };
+            
+            const [melhor, pior] = fornecedoresCotacao.reduce(([min, max], current) => {
+                return [
+                    (min.custo_efetivo < current.custo_efetivo) ? min : current,
+                    (max.custo_efetivo > current.custo_efetivo) ? max : current
+                ];
+            }, [fornecedoresCotacao[0], fornecedoresCotacao[0]]);
+            
+            analise.melhorFornecedor = melhor;
+            analise.piorFornecedor = pior;
+            
+            // Calcula totais e médias
+            fornecedoresCotacao.forEach(fornecedor => {
+                analise.totalBruto += fornecedor.valor_bruto;
+                analise.totalCredito += fornecedor.credito_iva;
+                analise.totalEfetivo += fornecedor.custo_efetivo;
+                
+                if(fornecedor.id !== melhor.id) {
+                    const diferenca = fornecedor.custo_efetivo - melhor.custo_efetivo;
+                    analise.diferencaPercentual[fornecedor.razao_social] = 
+                        (diferenca / fornecedor.custo_efetivo * 100).toFixed(2) + '%';
+                    analise.economiaTotal += diferenca;
+                }
             });
+            
+            analise.mediaCustos = analise.totalEfetivo / fornecedoresCotacao.length;
+            
+            return analise;
         }
 
-        function atualizarCamposServico() {
-            // Implementação placeholder
-            console.log('Atualizando campos de serviço...');
-        }
-
-        function adicionarFornecedor() {
-            // Implementação placeholder
-            console.log('Adicionando fornecedor...');
-        }
-
+        // Relatório em PDF - VERSÃO MELHORADA
         function gerarRelatorioPDF() {
-            // Implementação placeholder
-            console.log('Gerando relatório PDF...');
+            const { jsPDF } = window.jsPdf;
+            const doc = new jsPDF();
+            
+            // Cores do tema Plaenge
+            const primaryColor = '#4E4B48'; // Cinza escuro
+            const secondaryColor = '#BD1A3B'; // Vermelho
+            const accentColor = '#5C8F94'; // Verde-azulado
+            const textColor = '#292929'; // Cinza quase preto
+            const lightColor = '#FFFFFF'; // Branco
+            
+            // Configurações do documento
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(primaryColor);
+            doc.text('Relatório de Cotação Comparativa', 105, 20, { align: 'center' });
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(textColor);
+            doc.text(`Grupo Plaenge • ${new Date().toLocaleDateString('pt-BR')}`, 105, 27, { align: 'center' });
+            
+            // Nome do arquivo com timestamp
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            doc.save(`Relatorio_Cotacao_Plaenge_${timestamp}.pdf`);
         }
 
-        function exportarParaGoogleSheets() {
-            // Implementação placeholder
-            console.log('Exportando para Google Sheets...');
+        // Integração com Google Sheets
+        async function exportarParaGoogleSheets() {
+            alert('Funcionalidade de exportação para Google Sheets em desenvolvimento.');
+        }
+
+        // UI/UX Melhorada
+        function adicionarFeedback() {
+            const btn = document.getElementById('add-fornecedor-btn');
+            btn.classList.add('feedback-flash');
+            setTimeout(() => btn.classList.remove('feedback-flash'), 500);
+        }
+
+        // Dashboard de Análise
+        function criarDashboard() {
+            if(fornecedoresCotacao.length < 1) {
+                document.getElementById('dashboard-analise').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('dashboard-analise').style.display = 'grid';
+            
+            // Configuração do gráfico
+            const ctx = document.getElementById('analiseChart').getContext('2d');
+            
+            // Verifica se o gráfico já existe antes de tentar destruí-lo
+            if(window.analiseChart instanceof Chart) {
+                window.analiseChart.destroy();
+            }
+            
+            window.analiseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: fornecedoresCotacao.map(f => f.razao_social),
+                    datasets: [{
+                        label: 'Custo Efetivo (R$)',
+                        data: fornecedoresCotacao.map(f => f.custo_efetivo),
+                        backgroundColor: 'rgba(54, 96, 146, 0.7)',
+                        borderColor: 'rgba(54, 96, 146, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valor (R$)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Detalhes da análise
+            const analise = gerarAnaliseComparativa();
+            const detalhesDiv = document.getElementById('detalhes-analise');
+            
+            if(analise) {
+                detalhesDiv.innerHTML = `
+                    <p><strong>Melhor opção:</strong> ${analise.melhorFornecedor.razao_social} (R$ ${analise.melhorFornecedor.custo_efetivo.toFixed(2)})</p>
+                    <p><strong>Pior opção:</strong> ${analise.piorFornecedor.razao_social} (R$ ${analise.piorFornecedor.custo_efetivo.toFixed(2)})</p>
+                    <p><strong>Economia total potencial:</strong> R$ ${analise.economiaTotal.toFixed(2)}</p>
+                    <p><strong>Média de custos:</strong> R$ ${analise.mediaCustos.toFixed(2)}</p>
+                    <p><strong>Valor Bruto Total:</strong> R$ ${analise.totalBruto.toFixed(2)}</p>
+                    <p><strong>Crédito Total:</strong> R$ ${analise.totalCredito.toFixed(2)}</p>
+                    <p><strong>Custo Efetivo Total:</strong> R$ ${analise.totalEfetivo.toFixed(2)}</p>
+                    <h4>Diferenças percentuais em relação ao melhor:</h4>
+                    <ul>
+                        ${Object.entries(analise.diferencaPercentual).map(([nome, perc]) => 
+                          `<li><strong>${nome}:</strong> ${perc}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                detalhesDiv.innerHTML = '<p>Adicione pelo menos 2 fornecedores para ver a análise comparativa</p>';
+            }
         }
 
         // --- INICIALIZAÇÃO ---
         window.addEventListener('DOMContentLoaded', () => {
             carregarPrazosPagamento();
             
+            // Adiciona listener para atualizar campos quando o local do serviço for alterado
+            document.getElementById('local-servico').addEventListener('change', function() {
+                atualizarOpcoesEmpreendimento();
+                atualizarCamposServico();
+            });
+            
+            // Atualiza a tabela e dashboard se houver dados salvos
+            if(fornecedoresCotacao.length > 0) {
+                atualizarTabelaCotacao();
+            }
+
             // Inicializa na primeira aba
             updateHeaderForTab('cotacao');
         });
