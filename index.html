@@ -5,30 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Grupo Plaenge - Correção Cálculo Crédito</title>
     <style>
+        :root {
+            --color-bg: #f5f7fa;
+            --color-gradient-start: #f5f7fa;
+            --color-gradient-end: #c3cfe2;
+            --color-primary: #366092;
+            --color-primary-dark: #2c4a73;
+            --color-accent: #5C8F94;
+            --color-danger: #BD1A3B;
+            --color-warning: #ffc107;
+            --color-info: #31708f;
+            --color-surface: #ffffff;
+            --radius: 12px;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+            --shadow-md: 0 10px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.14);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #366092 0%, #2c4a73 100%); color: white; padding: 30px; text-align: center; }
+        .container { max-width: 1300px; margin: 0 auto; background: var(--color-surface); border-radius: 15px; box-shadow: var(--shadow-lg); overflow: hidden; }
+        .header { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; padding: 36px; text-align: center; }
         .header h1 { font-size: 2.5em; margin-bottom: 10px; }
         .header p { font-size: 1.1em; opacity: 0.9; }
         .main-content { padding: 40px; }
-        .tabs { display: flex; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; }
-        .tab { padding: 15px 30px; background: none; border: none; font-size: 1.1em; cursor: pointer; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
-        .tab.active { color: #366092; border-bottom-color: #366092; font-weight: bold; }
+        .tabs { display: flex; margin-bottom: 24px; gap: 8px; padding: 10px; border-bottom: none; background: #f8fafc; border-radius: 12px; box-shadow: var(--shadow-sm); }
+        .tab { padding: 10px 18px; background: #ffffff; border: 1px solid #e6e8ee; border-radius: 999px; font-size: 1.02em; cursor: pointer; color: #3b4a66; transition: all 0.2s ease; }
+        .tab:hover { background: #f3f7ff; color: var(--color-primary); transform: translateY(-1px); }
+        .tab.active { color: #ffffff; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); border-color: transparent; box-shadow: 0 6px 14px rgba(54,96,146,0.25); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .form-group { margin-bottom: 25px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #366092; }
-        .btn { background: linear-gradient(135deg, #366092 0%, #2c4a73 100%); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: transform 0.2s ease, background-color 0.3s; margin-right: 10px; }
-        .btn:hover { transform: translateY(-2px); }
-        .btn:disabled { background: #99a7b9; opacity: 0.7; cursor: not-allowed; transform: none; }
-        .result-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 25px; margin-top: 25px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e6e8ee; border-radius: 10px; font-size: 1em; transition: border-color 0.2s ease, box-shadow 0.2s ease; background: #ffffff; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(54,96,146,0.12); }
+        .btn { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%); color: white; padding: 14px 26px; border: none; border-radius: 10px; font-size: 1.05em; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease; margin-right: 10px; box-shadow: 0 8px 18px rgba(54,96,146,0.25); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(54,96,146,0.28); }
+        .btn:disabled { background: #99a7b9; opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+        .result-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 14px; padding: 25px; margin-top: 25px; box-shadow: var(--shadow-sm); }
         .result-card h3 { color: #366092; margin-bottom: 15px; font-size: 1.3em; }
-        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #dc3545; }
-        .info { background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #31708f; }
-        .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107; }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #31708f; }
+        .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #ffc107; }
         .loading { text-align: center; padding: 20px; color: #666; }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #366092; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -36,8 +53,8 @@
         
         /* Novos estilos adicionados */
         .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .chart-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .analise-card { background: #f8f9fa; border-radius: 10px; padding: 20px; margin-top: 20px; }
+        .chart-container { background: white; border-radius: 14px; padding: 20px; box-shadow: var(--shadow-sm); }
+        .analise-card { background: #f8f9fa; border-radius: 14px; padding: 20px; margin-top: 20px; box-shadow: var(--shadow-sm); }
         .favorito-btn { background: none; border: none; cursor: pointer; font-size: 1.2em; color: #ccc; transition: all 0.3s; }
         .favorito-btn.ativo { color: gold; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -635,10 +652,14 @@
                 p.style.display = subtitle ? 'block' : 'none';
             }
             
+            // Persistência de aba e ajustes específicos
+            try { localStorage.setItem('activeTab', tabName); } catch(e){}
             // Se for a aba "Pergunte ao Fiscal", ajusta a altura do iframe
             if (tabName === 'pergunte-fiscal') {
                 setTimeout(ajustarAlturaIframe, 100);
             }
+            // Rola para o topo suavemente para contexto claro
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function ajustarAlturaIframe() {
@@ -709,7 +730,7 @@
                     </div>
                     <div>
                         <label for="percentual-material">Material:</label>
-                        <input type="number" id="percentual-material" min="0" max="100) oninput="calcularTotalPercentual()">
+                        <input type="number" id="percentual-material" min="0" max="100" oninput="calcularTotalPercentual()">
                     </div>
                 `;
             } else if (tipoAquisicao === 'Serviço + Locação') {
@@ -731,7 +752,7 @@
                     </div>
                     <div>
                         <label for="percentual-locacao">Locação:</label>
-                        <input type="number" id="percentual-locacao" min="0) max="100" oninput="calcularTotalPercentual()">
+                        <input type="number" id="percentual-locacao" min="0" max="100" oninput="calcularTotalPercentual()">
                     </div>
                     <div>
                         <label for="percentual-material">Material:</label>
@@ -1975,7 +1996,7 @@
                         label: 'Custo Efetivo (R$)',
                         data: fornecedoresCotacao.map(f => f.custo_efetivo),
                         backgroundColor: 'rgba(54, 96, 146, 0.7)',
-                        borderColor: 'rgadyba(54, 96, 146, 1)',
+                        borderColor: 'rgba(54, 96, 146, 1)',
                         borderWidth: 1
                     }]
                 },
@@ -2097,12 +2118,21 @@
             if(fornecedoresCotacao.length > 0) {
                 atualizarTabelaCotacao();
             }
+
+            // Restaura a aba ativa
+            try {
+                const saved = localStorage.getItem('activeTab');
+                if (saved) {
+                    const btn = Array.from(document.querySelectorAll('.tab')).find(b => b.getAttribute('onclick')?.includes(`'${saved}'`));
+                    if (btn) showTab(saved, btn);
+                }
+            } catch(e){}
         });
 
         // --- Disponibiliza as funções para o HTML ---
         Object.assign(window, { 
             showTab, toggleAvisoReforma, toggleDetalheServico, atualizarOpcoesServico, 
-            adicionarFornecedor, remouterFornecedor, exportarParaCSV, limparCotacoes,
+            adicionarFornecedor, removerFornecedor, exportarParaCSV, limparCotacoes,
             gerarRelatorioPDF, exportarParaGoogleSheets, toggleFavorito,
             calcularTotalPercentual, atualizarCamposServico, consultarCNPJ, consultarMultiplosCNPJ
         });
