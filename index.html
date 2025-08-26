@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Grupo Plaenge - Correção Cálculo Crédito</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #366092 0%, #2c4a73 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .main-content { padding: 40px; }
+        .tabs { display: flex; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; }
+        .tab { padding: 15px 30px; background: none; border: none; font-size: 1.1em; cursor: pointer; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+        .tab.active { color: #366092; border-bottom-color: #366092; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #366092; }
+        .btn { background: linear-gradient(135deg, #366092 0%, #2c4a73 100%); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: transform 0.2s ease, background-color 0.3s; margin-right: 10px; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { background: #99a7b9; opacity: 0.7; cursor: not-allowed; transform: none; }
+        .result-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 25px; margin-top: 25px; }
+        .result-card h3 { color: #366092; margin-bottom: 15px; font-size: 1.3em; }
+        .error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #31708f; }
+        .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #366092; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .two-columns { display: grid; grid-template-columns: 400px 1fr; gap: 30px; }
+        
+        /* Novos estilos adicionados */
+        .dashboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .chart-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .analise-card { background: #f8f9fa; border-radius: 10px; padding: 20px; margin-top: 20px; }
+        .favorito-btn { background: none; border: none; cursor: pointer; font-size: 1.2em; color: #ccc; transition: all 0.3s; }
+        .favorito-btn.ativo { color: gold; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        .feedback-flash { animation: flash 0.5s; }
+        @keyframes flash { 0% { background-color: inherit; } 50% { background-color: #28a745; } 100% { background-color: inherit; } }
+        
+        /* Estilos para a distribuição percentual */
+        #distribuicao-percentual-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        #campos-percentuais input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        #total-percentual {
+            padding: 8px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        /* Estilos para a aba "Pergunte ao Fiscal" */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #366092 0%, #2c4a73 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .chat-iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .chat-history {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .chat-history h3 {
+            color: #366092;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .history-item {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #366092;
+        }
+        
+        .history-question {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .history-answer {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .history-date {
+            font-size: 0.8em;
+            color: #999;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 992px) { 
+            .two-columns { grid-template-columns: 1fr; } 
+            .dashboard-container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) { 
+            .tabs { flex-direction: column; } 
+            .tab { text-align: center; } 
+            .chat-container { height: 500px; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Cotação</h1>
+            <p>Construção Civil - Reforma Tributária</p>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('cotacao')">Cotação</button>
+                <button class="tab" onclick="showTab('consulta')">Consulta CNPJ</button>
+                <button class="tab" onclick="showTab('multiplos')">Consulta em Lote</button>
+                <button class="tab" onclick="showTab('pergunte-fiscal')">Pergunte ao Fiscal | Em Desenvolvimento</button>
+            </div>
+
+            <div id="cotacao" class="tab-content active">
+                <h2>Cotação Comparativa</h2>
+                <div class="two-columns">
+                    <div>
+                        <div class="form-group">
+                            <label for="ano-cenario">Ano do Cenário:</label>
+                            <select id="ano-cenario" onchange="toggleAvisoReforma()">
+                                <option value="2027">2027/2028 (Transição)</option>
+                                <option value="2033">2033 (Pós-Reforma)</option>
+                            </select>
+                        </div>
+                        <div id="aviso-reforma" class="info" style="display: none;">
+                            <b>Atenção:</b> O cenário de 2033 considera a aplicação completa das novas alíquotas da Reforma Tributária.
+                        </div>
+                        <div id="aviso-transicao" class="warning" style="display: none;">
+                            <b>Atenção:</b> O cenário de 2027/2028 considers apenas a CBS (9% para materiais). O IBS só será implementado em 2029.
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo-aquisicao">Tipo de Aquisição:</label>
+                            <select id="tipo-aquisicao" onchange="toggleDetalheServico()">
+                                <option value="">Selecione...</option>
+                                <option value="Material">Material</option>
+                                <option value="Serviço">Serviço</option>
+                                <option value="Serviço + Material">Serviço + Material</option>
+                                <option value="Serviço + Locação">Serviço + Locação</option>
+                                <option value="Serviço + Locação + Material">Serviço + Locação + Material</option>
+                            </select>
+                        </div>
+                        
+                        <div id="distribuicao-percentual-group" class="form-group" style="display: none;">
+                            <label>Distribuição Percentual (%)</label>
+                            <div id="campos-percentuais" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px;"></div>
+                            <div id="total-percentual" style="margin-top: 8px; font-weight: bold;">Total: 0%</div>
+                        </div>
+                        
+                        <div id="local-servico-group" class="form-group" style="display: none;">
+                            <label for="local-servico">Local do Serviço:</label>
+                            <select id="local-servico" onchange="atualizarCamposServico()">
+                                <option value="">Selecione o local...</option>
+                                <option value="Administrativo">Administrativo</option>
+                                <option value="Obra">Obra</option>
+                            </select>
+                        </div>
+                        <div id="empreendimento-group" class="form-group" style="display: none;">
+                            <label for="empreendimento">Empreendimento:</label>
+                            <select id="empreendimento">
+                                <option value="">Selecione o empreendimento...</option>
+                            </select>
+                        </div>
+                        <div id="detalhe-servico-group" class="form-group" style="display: none;">
+                            <label for="detalhe-servico">Tipo de Serviço:</label>
+                            <select id="detalhe-servico">
+                                <option value="">Selecione o tipo...</option>
+                            </select>
+                        </div>
+                        <hr style="margin: 20px 0;" />
+                        <h3>Adicionar Fornecedor</h3>
+                        <div class="form-group">
+                            <label for="cnpj-cotacao">CNPJ do Fornecedor:</label>
+                            <input type="text" id="cnpj-cotacao" placeholder="00.000.000/0000-00" maxlength="18">
+                        </div>
+                        <div class="form-group">
+                            <label for="valor-bruto">Valor Bruto da Nota Fiscal (R$):</label>
+                            <input type="number" id="valor-bruto" placeholder="0,00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="prazo-pagamento">Prazo de Pagamento:</label>
+                            <select id="prazo-pagamento">
+                                <!-- As opções serão preenchidas via JavaScript -->
+                            </select>
+                         </div>
+                        <button id="add-fornecedor-btn" class="btn" onclick="adicionarFornecedor()">Adicionar Fornecedor</button>
+                        <div id="erro-cotacao" class="error" style="display: none;"></div>
+                        <div id="api-key-warning" class="warning" style="display: none; margin-top: 20px;">
+                            <strong>Esta calculadora simula cotações na Construção Civil, considerando os impactos da Reforma Tributária em diferentes cenários (transição e pós-reforma).
+                        </div>
+                    </div>
+                    <div id="tabela-fornecedores-cotacao"></div>
+                </div>
+                
+                <div class="dashboard-container" id="dashboard-analise" style="display:none;">
+                    <div class="chart-container">
+                        <h3>Análise Comparativa</h3>
+                        <canvas id="analiseChart"></canvas>
+                    </div>
+                    
+                    <div class="analise-card" id="analise-comparativa">
+                        <h3>Detalhes da Análise</h3>
+                        <div id="detalhes-analise"></div>
+                        <button class="btn" onclick="gerarRelatorioPDF()" style="margin-top:15px;">Gerar Relatório PDF</button>
+                        <button class="btn" onclick="exportarParaGoogleSheets()" style="margin-top:15px;">Exportar para Google Sheets</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="consulta" class="tab-content">
+                <h2>Consulta de CNPJ</h2>
+                <div class="form-group">
+                    <label for="cnpj-consulta">CNPJ para consulta:</label>
+                    <input type="text" id="cnpj-consulta" placeholder="00.000.000/0000-00" maxlength="18">
+                </div>
+                <button class="btn" onclick="consultarCNPJ()">Consultar CNPJ</button>
+                <div id="resultado-consulta" class="result-card" style="display: none; margin-top: 20px;">
+                    <h3>Resultado da Consulta</h3>
+                    <div id="dados-cnpj"></div>
+                </div>
+            </div>
+            
+            <div id="multiplos" class="tab-content">
+                <h2>Consulta em Lote</h2>
+                <div class="form-group">
+                    <label for="cnpjs-lote">Lista de CNPJs (separados por vírgula ou linha):</label>
+                    <textarea id="cnpjs-lote" rows="6" placeholder="00.000.000/0000-00, 00.000.000/0000-00"></textarea>
+                </div>
+                <button class="btn" onclick="consultarMultiplosCNPJ()">Consultar CNPJs</button>
+                <div id="resultado-multiplos" class="result-card" style="display: none; margin-top: 20px;">
+                    <h3>Resultado das Consultas</h3>
+                    <div id="dados-multiplos-cnpj"></div>
+                </div>
+            </div>
+            
+            <!-- NOVA ABA: PERGUNTE AO FISCAL -->
+            <div id="pergunte-fiscal" class="tab-content">
+                <h2>Pergunte ao Fiscal | Em Desenvolvimento</h2>
+                <p>Utilize nosso chatbot especializado para tirar dúvidas sobre questões fiscais e tributárias.</p>
+                
+                <div class="chat-container">
+                    <div class="chat-header">
+                        Assistente Fiscal - Grupo Plaenge
+                    </div>
+                    <iframe class="chat-iframe" src="https://bot.atendee.app.br/testereforma" frameborder="0"></iframe>
+                </div>
+                
+                <div class="chat-history">
+                    <h3>Histórico de Perguntas Frequentes</h3>
+                    <div id="historico-perguntas">
+                        <div class="history-item">
+                            <div class="history-question">Como a reforma tributária impacta o setor de construção civil?</div>
+                            <div class="history-answer">A reforma unifica vários impostos no IBS e CBS, com alíquotas diferenciadas para o setor...</div>
+                            <div class="history-date">15/08/2025</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-question">Quais as alíquotas aplicáveis para serviços na obra?</div>
+                            <div class="history-answer">Serviços na obra terão alíquotas reduzidas em comparação com serviços administrativos...</div>
+                            <div class="history-date">12/08/2025</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-question">O que muda para o Simples Nacional na reforma?</div>
+                            <div class="history-answer">O Simples Nacional continuará existindo, mas com alterações nas alíquotas e regimes...</div>
+                            <div class="history-date">10/08/2025</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURAÇÕES E VARIÁVEIS GLOBAIS ---
+        const API_KEY = "ec83f922-db4f-4cec-924f-77f5c6320fa8-0ebe2bcd-046f-4a1b-9cdb-f4085b39f272";
+        const API_BASE_URL = "https://api.cnpja.com/office/";
+        let fornecedoresCotacao = JSON.parse(localStorage.getItem('fornecedoresCotacao')) || [];
+        let fornecedoresFavoritos = JSON.parse(localStorage.getItem('fornecedoresFavoritos')) || [];
+
+        // --- FUNÇÕES DE INTERFACE (UI) ---
+        function formatarCNPJ(input) {
+            let value = input.value ? input.value.replace(/\D/g, '') : input.replace(/\D/g, '');
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2')
+                         .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+                         .replace(/\.(\d{3})(\d)/, '.$1/$2')
+                         .replace(/(\d{4})(\d)/, '$1-$2');
+            if (input.value !== undefined) input.value = value;
+            return value;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Oculta a tabela de fornecedores e dashboard quando não estiver na aba de cotação
+            const tabelaFornecedores = document.getElementById('tabela-fornecedores-cotacao');
+            const dashboardAnalise = document.getElementById('dashboard-analise');
+            
+            if (tabName !== 'cotacao') {
+                if (tabelaFornecedores) {
+                    tabelaFornecedores.innerHTML = '';
+                }
+                if (dashboardAnalise) {
+                    dashboardAnalise.style.display = 'none';
+                }
+            } else {
+                // Se voltar para a aba de cotação, restaura a tabela se houver dados
+                if (fornecedoresCotacao.length > 0) {
+                    atualizarTabelaCotacao();
+                }
+            }
+            
+            // Se for a aba "Pergunte ao Fiscal", ajusta a altura do iframe
+            if (tabName === 'pergunte-fiscal') {
+                setTimeout(ajustarAlturaIframe, 100);
+            }
+        }
+
+        function ajustarAlturaIframe() {
+            const iframe = document.querySelector('.chat-iframe');
+            if (iframe) {
+                iframe.style.height = '100%';
+            }
+        }
+
+        // --- INICIALIZAÇÃO ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Inicialização básica
+            console.log('Aplicação carregada');
+        });
+
+        // --- Disponibiliza as funções para o HTML ---
+        Object.assign(window, { 
+            showTab, ajustarAlturaIframe
+        });
+    </script>
+</body>
+</html>
