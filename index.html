@@ -171,10 +171,10 @@
 
         <div class="main-content">
             <div class="tabs">
-                <button class="tab active" onclick="showTab('cotacao', this)" data-title="Calculadora de Cotação" data-subtitle="Construção Civil - Reforma Tributária">Cotação</button>
-                <button class="tab" onclick="showTab('consulta', this)" data-title="Consulta de CNPJ" data-subtitle="Verifique situação cadastral e regime tributário">Consulta CNPJ</button>
-                <button class="tab" onclick="showTab('multiplos', this)" data-title="Consulta em Lote" data-subtitle="Pesquise vários CNPJs de uma vez">Consulta em Lote</button>
-                <button class="tab" onclick="showTab('pergunte-fiscal', this)" data-title="Pergunte ao Fiscal" data-subtitle="Chatbot fiscal em desenvolvimento">Pergunte ao Fiscal | Em Desenvolvimento</button>
+                <button class="tab active" data-target="cotacao" onclick="showTab('cotacao', this)" data-title="Calculadora de Cotação" data-subtitle="Construção Civil - Reforma Tributária">Cotação</button>
+                <button class="tab" data-target="consulta" onclick="showTab('consulta', this)" data-title="Consulta de CNPJ" data-subtitle="Verifique situação cadastral e regime tributário">Consulta CNPJ</button>
+                <button class="tab" data-target="multiplos" onclick="showTab('multiplos', this)" data-title="Consulta em Lote" data-subtitle="Pesquise vários CNPJs de uma vez">Consulta em Lote</button>
+                <button class="tab" data-target="pergunte-fiscal" onclick="showTab('pergunte-fiscal', this)" data-title="Pergunte ao Fiscal" data-subtitle="Chatbot fiscal em desenvolvimento">Pergunte ao Fiscal | Em Desenvolvimento</button>
             </div>
 
             <div id="cotacao" class="tab-content active">
@@ -2036,11 +2036,11 @@
         }
 
         // Sistema de Favoritos
-        function toggleFavorito(event, cnpj, razaoSocial) {
-            event.preventDefault();
-            event.stopPropagation();
+        function toggleFavorito(ev, cnpj, razaoSocial) {
+            if (ev && ev.preventDefault) ev.preventDefault();
+            if (ev && ev.stopPropagation) ev.stopPropagation();
             
-            const btn = event.target;
+            const btn = ev?.target;
             const index = fornecedoresFavoritos.findIndex(f => f.cnpj === cnpj);
             
             if(index === -1) {
