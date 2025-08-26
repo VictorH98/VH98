@@ -922,6 +922,14 @@
             return await response.json();
         }
 
+        // Helper: prioriza MEI e evita marcar Simples quando MEI for verdadeiro
+        function getRegimeTributarioFromApi(apiData) {
+            const isMEI = apiData?.company?.simples?.mei === true;
+            if (isMEI) return 'MEI';
+            const isSimples = apiData?.company?.simples?.optant === true;
+            return isSimples ? 'Simples Nacional' : 'Normal';
+        }
+
         // FUNÇÃO CORRIGIDA: Calcula o valor do imposto "por fora" e mantém a alíquota real
         function calcularCreditoComponente(tipo, localServico, tipoServico, ano, isSimples, valorBruto) {
             let aliquotaReal = 0;
@@ -1502,6 +1510,7 @@
                 resultadoDiv.style.display = 'block';
                 
                 const apiData = await fetchCNPJData(cnpj);
+                const regime = getRegimeTributarioFromApi(apiData);
                 
                 dadosDiv.innerHTML = `
                     <div style="line-height: 1.8;">
@@ -1512,7 +1521,7 @@
                         <div><strong>Porte:</strong> ${apiData.size?.text || 'Não informado'}</div>
                         <div><strong>Natureza Jurídica:</strong> ${apiData.legalNature?.text || 'Não informada'}</div>
                         <div><strong>Atividade Principal:</strong> ${apiData.mainActivity?.text || 'Não informada'}</div>
-                        <div><strong>Regime Tributário:</strong> ${apiData.company?.simples?.optant ? 'Simples Nacional' : 'Normal'} ${apiData.company?.simples?.mei ? '(MEI)' : ''}</div>
+                        <div><strong>Regime Tributário:</strong> ${regime}</div>
                         <div><strong>Endereço:</strong> ${apiData.address?.street || ''}, ${apiData.address?.number || ''} - ${apiData.address?.district || ''}, ${apiData.address?.city || ''} - ${apiData.address?.state || ''}</div>
                     </div>
                 `;
@@ -1559,12 +1568,13 @@
                 for (const cnpj of cnpjs) {
                     try {
                         const apiData = await fetchCNPJData(cnpj);
+                        const regime = getRegimeTributarioFromApi(apiData);
                         resultadosHTML += `
                             <tr>
                                 <td style="padding: 10px; border: 1px solid #ddd;">${formatarCNPJ(apiData.taxId)}</td>
                                 <td style="padding: 10px; border: 1px solid #ddd;">${apiData.company?.name || apiData.name || 'Não informado'}</td>
                                 <td style="padding: 10px; border: 1px solid #ddd;">${apiData.status?.text || 'Não informada'}</td>
-                                <td style="padding: 10px; border: 1px solid #ddd;">${apiData.company?.simples?.optant ? 'Simples Nacional' : 'Normal'} ${apiData.company?.simples?.mei ? '(MEI)' : ''}</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">${regime}</td>
                             </tr>
                         `;
                     } catch (error) {
