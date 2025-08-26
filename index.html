@@ -267,7 +267,7 @@
                         <h3>Detalhes da Análise</h3>
                         <div id="detalhes-analise"></div>
                         <button class="btn" onclick="gerarRelatorioPDF()" style="margin-top:15px;">Gerar Relatório PDF</button>
-                        <button class="btn" onclick="exportarParaGoogleSheets()" style="margin-top:15px;">Exportar para Google Sheets</button>
+                        <button class="btn" onclick="exportarParaGoogleSheets(this)" style="margin-top:15px;">Exportar para Google Sheets</button>
                     </div>
                 </div>
             </div>
@@ -1907,14 +1907,13 @@
         }
 
         // Integração com Google Sheets
-        async function exportarParaGoogleSheets() {
+        async function exportarParaGoogleSheets(btnEl) {
             // Substitua pela URL do seu Web App do Google Apps Script
             const scriptUrl = 'https://script.google.com/macros/s/SEU_SCRIPT_ID/exec';
             
             try {
-                const btn = event.target;
-                btn.disabled = true;
-                btn.textContent = 'Exportando...';
+                const btn = btnEl;
+                if (btn) { btn.disabled = true; btn.textContent = 'Exportando...'; }
                 
                 const dados = {
                     data: new Date().toISOString(),
@@ -1942,15 +1941,13 @@
                     mode: 'no-cors'
                 });
                 
-                btn.disabled = false;
-                btn.textContent = 'Exportar para Google Sheets';
+                if (btn) { btn.disabled = false; btn.textContent = 'Exportar para Google Sheets'; }
                 
                 alert('Dados enviados para o Google Sheets com sucesso!');
             } catch (error) {
                 console.error('Erro na exportação:', error);
-                const btn = document.querySelector('button[onclick="exportarParaGoogleSheets()"]');
-                btn.disabled = false;
-                btn.textContent = 'Exportar para Google Sheets';
+                const btnFallback = btnEl || document.querySelector('button[onclick*="exportarParaGoogleSheets("]');
+                if (btnFallback) { btnFallback.disabled = false; btnFallback.textContent = 'Exportar para Google Sheets'; }
                 alert('Erro ao exportar para o Google Sheets: ' + error.message);
             }
         }
